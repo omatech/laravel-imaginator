@@ -1,3 +1,3 @@
 <picture>
-    {!! imaginatorGenUrls($id, $alt, $formats, $sets) !!}
+    {!! imaginatorGenUrls($id, $alt, $formats, $options, $sets) !!}
 </picture>

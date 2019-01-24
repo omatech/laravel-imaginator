@@ -22,17 +22,17 @@ class Imaginator
         $format = $this->supportedFormat($data['format']);
 
         foreach ($sizes as $size) {
-            $srcset .= $this->prepareUri($data['hash'], $data['format'], $size);
+            $srcset .= $this->prepareUri($data['hash'], $data['format'], $data['options'], $size);
         }
 
         if (empty($srcset)) {
-            $srcset .= $this->prepareUri($data['hash'], $data['format']);
+            $srcset .= $this->prepareUri($data['hash'], $data['format'], $data['options']);
         } else {
             $srcset = substr($srcset, 0, -2);
         }
 
         return [
-            'base'  =>  $this->prepareUri($data['hash'], 'png'),
+            'base'  =>  $this->prepareUri($data['hash'], 'png', $data['options']),
             'srcset' => $srcset,
             'format' => $format
         ];
@@ -62,15 +62,15 @@ class Imaginator
         return $http;
     }
 
-    private function prepareUri($hash, $format, $size = null)
+    private function prepareUri($hash, $format, $options = [], $size = null)
     {
-        $sig = $this->signature->generateSignature($hash, ['w' => $size, 'fm' => $format]);
+        $sig = $this->signature->generateSignature($hash, array_merge(['w' => $size, 'fm' => $format], $options));
         
-        $uri = $this->baseUrl.$hash.'?'.http_build_query([
+        $uri = $this->baseUrl.$hash.'?'.http_build_query(array_merge($options, [
             's' => $sig,
             'w' => $size,
             'fm' => $format
-        ]);
+        ]));
 
         if ($size) {
             $uri .= " {$size}w, ";
