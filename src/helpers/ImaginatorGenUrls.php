@@ -40,7 +40,7 @@ function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets =
         }
     }
 
-    $html .= "<img src='{$imaginator->generateUrls(['hash' => $id])['base']}' alt={$alt}>";
+    $html .= "<img src='{$imaginator->generateUrls(['hash' => $id])['base']}' alt='{$alt}'>";
     
     return $html;
 }
