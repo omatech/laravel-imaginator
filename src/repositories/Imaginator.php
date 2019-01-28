@@ -18,21 +18,24 @@ class Imaginator
     public function generateUrls($data)
     {
         $srcset = '';
-        $sizes = $data['srcset'];
-        $format = $this->supportedFormat($data['format']);
+        $sizes = $data['srcset'] ?? [];
+        $options = $data['options'] ?? [];
+        $format = $data['format'] ?? [];
+
+        $format = $this->supportedFormat($format);
 
         foreach ($sizes as $size) {
-            $srcset .= $this->prepareUri($data['hash'], $data['format'], $data['options'], $size);
+            $srcset .= $this->prepareUri($data['hash'], $format, $options, $size);
         }
 
         if (empty($srcset)) {
-            $srcset .= $this->prepareUri($data['hash'], $data['format'], $data['options']);
+            $srcset .= $this->prepareUri($data['hash'], $format, $options);
         } else {
             $srcset = substr($srcset, 0, -2);
         }
 
         return [
-            'base'  =>  $this->prepareUri($data['hash'], 'png', $data['options']),
+            'base'  =>  $this->prepareUri($data['hash'], 'png', $options),
             'srcset' => $srcset,
             'format' => $format
         ];
@@ -51,7 +54,12 @@ class Imaginator
             $http = $scheme;
         }
 
-        $http .= config('imaginator.server');
+        if (empty($url)) {
+            $domain = parse_url(url()->current());
+            $http .= $domain['host'].':'.$domain['port'];
+        } else {
+            $http .= $url;
+        }
 
         if (!empty($prefix)) {
             $http .= '/'.$prefix;

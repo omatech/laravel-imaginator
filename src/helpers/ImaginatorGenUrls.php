@@ -2,7 +2,7 @@
 
 use Omatech\Imaginator\Repositories\Imaginator;
 
-function imaginatorGenUrls($id, $alt, $formats, $options, $sets)
+function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets = [])
 {
     $imaginator = new Imaginator();
 
@@ -21,7 +21,7 @@ function imaginatorGenUrls($id, $alt, $formats, $options, $sets)
 
             $urls = $imaginator->generateUrls([
                 'hash'    => $id,
-                'srcset'  => $srcset,
+                'srcset'  => $srcset ?? [],
                 'media'   => $set['media'] ?? '',
                 'sizes'   => $set['sizes'] ?? '',
                 'options' => $options ?? [],
@@ -40,7 +40,7 @@ function imaginatorGenUrls($id, $alt, $formats, $options, $sets)
         }
     }
 
-    $html .= "<img src='{$urls['base']}' alt={$alt}>";
+    $html .= "<img src='{$imaginator->generateUrls(['hash' => $id])['base']}' alt={$alt}>";
     
     return $html;
 }
