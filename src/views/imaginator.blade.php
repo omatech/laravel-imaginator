@@ -1,7 +1,7 @@
 <picture @if(!empty($class)) class='{{$class}}' @endif>
     @php
         $alt = (!empty($alt)) ? $alt : '';
-        $format = (!empty($formats)) ? $formats : [];
+        $formats = (!empty($formats)) ? $formats : [];
         $options = (!empty($options)) ? $options : [];
         $sets = (!empty($sets)) ? $sets : [];
 
