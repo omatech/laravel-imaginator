@@ -1,5 +1,6 @@
 {
     "name": "omatech/laravel-imaginator",
+    "license": "MIT",
     "description": "",
     "require": {
         "league/glide-laravel": "^1.0"

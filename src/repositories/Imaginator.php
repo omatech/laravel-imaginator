@@ -3,6 +3,10 @@
 namespace Omatech\Imaginator\Repositories;
 
 use League\Glide\Signatures\Signature;
+use Omatech\Imaginator\Contracts\GetImageInterface;
+use Illuminate\Support\Facades\Storage;
+use League\Glide\Responses\LaravelResponseFactory;
+use League\Glide\ServerFactory;
 
 class Imaginator
 {
@@ -100,7 +104,6 @@ class Imaginator
         return $uri;
     }
 
-
     private function supportedFormat($format)
     {
         $formats = ['webp', 'png', 'jpg', 'gif'];
@@ -118,5 +121,64 @@ class Imaginator
             return false;
         }
         return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    public function getProcessedImage($path, $params)
+    {
+        $image = app()->make(GetImageInterface::class);
+        $image = $image->extract($path);
+
+        $server = ServerFactory::create([
+            'response'   => new LaravelResponseFactory(app('request')),
+            'source'     => Storage::disk(config('imaginator.source_disk'))->getDriver(),
+            'cache'      => Storage::disk(config('imaginator.cache_disk'))->getDriver(),
+            'watermarks' => Storage::disk(config('imaginator.cache_disk'))->getDriver(),
+            'watermarks_path_prefix' => '.watermarks',
+            'cache_path_prefix'      => '.cache'
+        ]);
+
+        if (isset($params['debug']) && $params['debug'] == true) {
+            $params = $this->processDebug($params);
+            $server->deleteCache($image);
+        }
+
+        return $server->getImageResponse($image, $params);
+    }
+
+    private function processDebug($params)
+    {
+        return $this->generateDebugWatermark($params);
+    }
+
+    private function generateDebugWatermark($params)
+    {
+        $width = $params['w'] ?? 'original';
+        $format = $params['fm'] ?? 'png';
+        $fileName = $width.'_'.$format.'.png';
+        $params['mark'] = $fileName;
+
+        $imgWidth = 150;
+        $imgHeight = 27;
+        $fontSize = 5;
+        $text = "$width - $format";
+
+        //center
+        $xPosition = (($imgWidth/2)-((imagefontwidth($fontSize)*strlen($text))/2));
+        $yPosition = (($imgHeight/2)-(imagefontheight($fontSize)/2));
+
+        $newImg = imagecreate($imgWidth, $imgHeight);
+        $bgColor = imagecolorallocate($newImg, 0, 0, 0);
+        $fontColor = imagecolorallocate($newImg, 255, 0, 0);
+        imagestring($newImg, $fontSize, $xPosition, $yPosition, $text, $fontColor);
+
+        ob_start();
+        imagepng($newImg);
+        $image = ob_get_contents();
+        ob_end_clean();
+
+        Storage::disk(config('imaginator.cache_disk'))->put('.watermarks/'.$fileName, $image);
+        imagedestroy($newImg);
+
+        return $params;
     }
 }
