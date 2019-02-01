@@ -24,8 +24,12 @@ class Imaginator
 
         $format = $this->supportedFormat($format);
 
-        foreach ($sizes as $size) {
-            $srcset .= $this->prepareUri($data['hash'], $format, $options, $size);
+        if (!$this->isAssoc($sizes)) {
+            $sizes = array_combine($sizes, $sizes);
+        }
+        
+        foreach ($sizes as $size => $width) {
+            $srcset .= $this->prepareUri($data['hash'], $format, $options, [$size => $width]);
         }
 
         if (empty($srcset)) {
@@ -41,7 +45,6 @@ class Imaginator
         ];
     }
 
-
     private function getBaseUrl()
     {
         $scheme = config('imaginator.scheme');
@@ -55,8 +58,10 @@ class Imaginator
         }
 
         if (empty($url)) {
-            $domain = parse_url(url()->current());
-            $http .= $domain['host'].':'.$domain['port'];
+            $url = parse_url(url()->current());
+            $host = $url['host'];
+            $port = (isset($url['port'])) ? ':'.$url['port'] : '';
+            $http .= $host.$port;
         } else {
             $http .= $url;
         }
@@ -72,11 +77,19 @@ class Imaginator
 
     private function prepareUri($hash, $format, $options = [], $size = null)
     {
-        $sig = $this->signature->generateSignature($hash, array_merge(['w' => $size, 'fm' => $format], $options));
+        if ($size) {
+            $width = key($size);
+            $size = $size[key($size)];
+        } else {
+            $width = null;
+            $size = null;
+        }
+
+        $sig = $this->signature->generateSignature($hash, array_merge(['w' => $width, 'fm' => $format], $options));
         
         $uri = $this->baseUrl.$hash.'?'.http_build_query(array_merge($options, [
             's' => $sig,
-            'w' => $size,
+            'w' => $width,
             'fm' => $format
         ]));
 
@@ -97,5 +110,13 @@ class Imaginator
         }
 
         return 'png';
+    }
+
+    private function isAssoc(array $arr)
+    {
+        if (array() === $arr) {
+            return false;
+        }
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }

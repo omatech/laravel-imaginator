@@ -12,7 +12,13 @@ function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets =
     foreach ($formats as $format) {
         foreach ($sets as $index => $set) {
             if (!empty($set['srcset'])) {
-                $srcset = array_map('trim', explode(',', $set['srcset']));
+                if (gettype($set['srcset']) == 'array') {
+                    $srcset = $set['srcset'];
+                } elseif (gettype($set['srcset']) === 'integer') {
+                    $srcset = [$set['srcset'] => $set['srcset']];
+                } else {
+                    $srcset = [];
+                }
             } else {
                 $srcset = [];
             }
@@ -40,7 +46,7 @@ function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets =
         }
     }
 
-    $html .= "<img src='{$imaginator->generateUrls(['hash' => $id])['base']}' alt='{$alt}'>";
+    $html .= "<img src='{$imaginator->generateUrls(['hash' => $id, 'options'=> $options])['base']}' alt='{$alt}'>";
     
     return $html;
 }

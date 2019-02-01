@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Omatech\Imaginator\Contracts\GetImageInterface;
 use Omatech\Imaginator\Providers\HelpersServiceProvider;
 use Omatech\Imaginator\Providers\ConfigurationServiceProvider;
+use Omatech\Imaginator\Middlewares\GlideSecurityMiddleware;
 
 class ImaginatorServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,7 @@ class ImaginatorServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app['router']->aliasMiddleware('glideSecurity', GlideSecurityMiddleware::class);
     }
 
     private function providers()
