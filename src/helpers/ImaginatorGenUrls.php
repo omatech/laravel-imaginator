@@ -23,20 +23,24 @@ if (! function_exists('imaginatorGenUrls')) {
             foreach ($sets as $index => $set) {
                 if (!empty($set['srcset'])) {
                     if (gettype($set['srcset']) == 'array') {
+                        $currentUrl = $set['id'] ?? null;
                         $srcset = $set['srcset'];
                     } elseif (gettype($set['srcset']) === 'integer') {
+                        $currentUrl = $set['id'] ?? null;
                         $srcset = [$set['srcset'] => $set['srcset']];
                     } else {
+                        $currentUrl = null;
                         $srcset = [];
                     }
                 } else {
+                    $currentUrl = null;
                     $srcset = [];
                 }
 
                 $html .= "<source";
 
                 $urls = $imaginator->generateUrls([
-                    'hash' => $id,
+                    'hash' => $currentUrl ?? $id,
                     'srcset' => $srcset ?? [],
                     'media' => $set['media'] ?? '',
                     'sizes' => $set['sizes'] ?? '',
