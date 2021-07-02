@@ -60,6 +60,12 @@ We will need a class with the method `extract` to get the image path. You can ov
     // Alt of the image.
     'alt' => 'alt',
 
+    // Class of picture element
+    'class' => 'image',
+
+    // If exists loading attribute, add loading tag and value in picture element
+    'loading' => 'lazy',
+    
     // All the formats in which to generate the image.
     'formats' => ['webp','png','jpg'],
 
