@@ -12,7 +12,7 @@ if (! function_exists('imaginatorGenUrls')) {
      * @param array $sets
      * @return string
      */
-    function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets = [])
+    function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets = [], $loading='')
     {
         $imaginator = new Imaginator();
 
@@ -60,7 +60,10 @@ if (! function_exists('imaginatorGenUrls')) {
             }
         }
 
-        $html .= "<img src='{$imaginator->generateUrls(['hash' => $id, 'options'=> $options])['base']}' alt='{$alt}'>";
+        if($loading!=''){
+            $loading = 'loading="'.$loading.'"';
+        }
+        $html .= "<img src='{$imaginator->generateUrls(['hash' => $id, 'options'=> $options])['base']}' alt='{$alt}' $loading>";
 
         return $html;
     }
