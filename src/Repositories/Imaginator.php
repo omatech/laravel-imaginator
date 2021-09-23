@@ -2,11 +2,12 @@
 
 namespace Omatech\Imaginator\Repositories;
 
-use League\Glide\Signatures\Signature;
-use Omatech\Imaginator\Contracts\GetImageInterface;
 use Illuminate\Support\Facades\Storage;
+use League\Glide\Filesystem\FileNotFoundException;
 use League\Glide\Responses\LaravelResponseFactory;
 use League\Glide\ServerFactory;
+use League\Glide\Signatures\Signature;
+use Omatech\Imaginator\Contracts\GetImageInterface;
 
 class Imaginator
 {
@@ -18,7 +19,7 @@ class Imaginator
         $this->signature = new Signature(config('imaginator.key'));
         $this->baseUrl = $this->getBaseUrl();
     }
-    
+
     public function generateUrls($data)
     {
         $srcset = '';
@@ -31,7 +32,7 @@ class Imaginator
         if (!$this->isAssoc($sizes)) {
             $sizes = array_combine($sizes, $sizes);
         }
-        
+
         foreach ($sizes as $size => $width) {
             $srcset .= $this->prepareUri($data['hash'], $format, $options, [$size => $width]);
         }
@@ -90,7 +91,7 @@ class Imaginator
         }
 
         $sig = $this->signature->generateSignature($hash, array_merge(['w' => $width, 'fm' => $format], $options));
-        
+
         $uri = $this->baseUrl.$hash.'?'.http_build_query(array_merge($options, [
             's' => $sig,
             'w' => $width,
@@ -125,24 +126,36 @@ class Imaginator
 
     public function getProcessedImage($path, $params)
     {
-        $image = app()->make(GetImageInterface::class);
-        $image = $image->extract($path);
-
-        $server = ServerFactory::create([
-            'response'   => new LaravelResponseFactory(app('request')),
-            'source'     => Storage::disk(config('imaginator.source_disk'))->getDriver(),
-            'cache'      => Storage::disk(config('imaginator.cache_disk'))->getDriver(),
-            'watermarks' => Storage::disk(config('imaginator.cache_disk'))->getDriver(),
-            'watermarks_path_prefix' => '.watermarks',
-            'cache_path_prefix'      => '.cache'
-        ]);
-
-        if (isset($params['debug']) && $params['debug'] == true) {
-            $params = $this->processDebug($params);
-            $server->deleteCache($image);
+        $loaders = config('imaginator.loaders');
+        foreach ($loaders as $loader) {
+            try {
+                $path = $this->extractImage(app()->make($loader['get_image_class']), $path);
+                $server = ServerFactory::create([
+                    'response'   => new LaravelResponseFactory(app('request')),
+                    'source'     => Storage::disk($loader['source_disk'])->getDriver(),
+                    'cache'      => Storage::disk($loader['cache_disk'])->getDriver(),
+                    'watermarks' => Storage::disk($loader['cache_disk'])->getDriver(),
+                    'watermarks_path_prefix' => '.watermarks',
+                    'cache_path_prefix'      => '.cache'
+                ]);
+                if (isset($params['debug']) && $params['debug'] == true) {
+                    $params = $this->processDebug($params);
+                    $server->deleteCache($path);
+                }
+                $response = $server->getImageResponse($path, $params);
+                if ($response) {
+                    break;
+                }
+            } catch (FileNotFoundException $e) {
+                $response = null;
+            }
         }
+        return $response;
+    }
 
-        return $server->getImageResponse($image, $params);
+    private function extractImage(GetImageInterface $getImage, $path)
+    {
+        return $getImage->extract($path);
     }
 
     private function processDebug($params)
