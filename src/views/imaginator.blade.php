@@ -1,4 +1,4 @@
-<picture @if(!empty($class)) class='{{$class}}' @endif >
+<picture {{ $attributes }} @endif >
     @php 
         $alt = (!empty($alt)) ? $alt : ''; 
         $formats = (!empty($formats)) ? $formats : []; 
