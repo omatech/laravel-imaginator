@@ -1,26 +1,41 @@
 <?php
+namespace Omatech\Imaginator\Component;
 
+use Illuminate\View\Component;
 use Omatech\Imaginator\Repositories\Imaginator;
 
-if (! function_exists('imaginatorGenUrls')) {
+class ImaginatorComponent extends Component
+{
+    private $imaginator;
+    public $id;
+    public $alt;
+    public $formats;
+    public $options;
+    public $sets;
 
-    /**
-     * @param $id
-     * @param string $alt
-     * @param array $formats
-     * @param array $options
-     * @param array $sets
-     * @return string
-     */
-    function imaginatorGenUrls($id, $alt = '', $formats = [], $options = [], $sets = [], $loading='')
+    public function __construct(
+        Imaginator $imaginator,
+        $id = '',
+        $alt = '',
+        $formats = [],
+        $options = [],
+        $sets = []
+    ) {
+        $this->imaginator = $imaginator;
+        $this->id = $id;
+        $this->alt = $alt;
+        $this->formats = $formats;
+        $this->options = $options;
+        $this->sets = $sets;
+    }
+
+    private function imaginatorGenUrls()
     {
-        $imaginator = new Imaginator();
-
         $html = '';
         $urls = '';
 
-        foreach ($formats as $format) {
-            foreach ($sets as $index => $set) {
+        foreach ($this->formats as $format) {
+            foreach ($this->sets as $set) {
                 if (!empty($set['srcset'])) {
                     if (gettype($set['srcset']) == 'array') {
                         $currentUrl = $set['id'] ?? null;
@@ -39,8 +54,8 @@ if (! function_exists('imaginatorGenUrls')) {
 
                 $html .= "<source";
 
-                $urls = $imaginator->generateUrls([
-                    'hash' => $currentUrl ?? $id,
+                $urls = $this->imaginator->generateUrls([
+                    'hash' => $currentUrl ?? $this->id,
                     'srcset' => $srcset ?? [],
                     'media' => $set['media'] ?? '',
                     'sizes' => $set['sizes'] ?? '',
@@ -60,11 +75,18 @@ if (! function_exists('imaginatorGenUrls')) {
             }
         }
 
-        if($loading!=''){
-            $loading = 'loading="'.$loading.'"';
-        }
-        $html .= "<img src='{$imaginator->generateUrls(['hash' => $id, 'options'=> $options])['base']}' alt='{$alt}' $loading>";
-
+        $html .= "<img src='{$this->imaginator->generateUrls(['hash' => $this->id, 'options'=> $this->options])['base']}' alt='{$this->alt}' loading='lazy'>";
         return $html;
+    }
+
+
+    public function render()
+    {
+        return function (array $data) {
+            $attributes = $data['attributes']->filter(fn ($attribute, $key) => !is_array($attribute) && $key !== 'id' && $key !== 'alt');
+            return "<picture {$attributes->__toString()}>
+                {$this->imaginatorGenUrls()}
+            </picture>";
+        };
     }
 }

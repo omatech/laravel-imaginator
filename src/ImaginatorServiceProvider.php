@@ -5,9 +5,8 @@ namespace Omatech\Imaginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Omatech\Imaginator\Contracts\GetImageInterface;
-use Omatech\Imaginator\Providers\HelpersServiceProvider;
-use Omatech\Imaginator\Providers\ConfigurationServiceProvider;
 use Omatech\Imaginator\Middlewares\GlideSecurityMiddleware;
+use Omatech\Imaginator\Providers\ConfigurationServiceProvider;
 
 class ImaginatorServiceProvider extends ServiceProvider
 {
@@ -26,12 +25,8 @@ class ImaginatorServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->providers();
-
-        $this->loadViewsFrom(__DIR__.'/views', 'imaginator');
-        Blade::component('imaginator::imaginator', 'imaginator');
-
+        Blade::component('imaginator', ImaginatorComponent::class);
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
-
         $this->app->bind(GetImageInterface::class, config('imaginator.get_image_class'));
     }
 
@@ -48,7 +43,6 @@ class ImaginatorServiceProvider extends ServiceProvider
     private function providers()
     {
         $this->app->register(ConfigurationServiceProvider::class);
-        $this->app->register(HelpersServiceProvider::class);
     }
 
     public function provides()
