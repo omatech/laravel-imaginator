@@ -1,4 +1,4 @@
-<picture {{ $attributes }} @endif >
+<picture {{ $attributes }} >
     @php 
         $alt = (!empty($alt)) ? $alt : ''; 
         $formats = (!empty($formats)) ? $formats : []; 
