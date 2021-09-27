@@ -4,6 +4,7 @@ namespace Omatech\Imaginator;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Omatech\Imaginator\Component\ImaginatorComponent;
 use Omatech\Imaginator\Contracts\GetImageInterface;
 use Omatech\Imaginator\Middlewares\GlideSecurityMiddleware;
 use Omatech\Imaginator\Providers\ConfigurationServiceProvider;
