@@ -12,6 +12,7 @@ class ImaginatorComponent extends Component
     public $formats;
     public $options;
     public $sets;
+    public $loading;
 
     public function __construct(
         Imaginator $imaginator,
@@ -19,7 +20,8 @@ class ImaginatorComponent extends Component
         $alt = '',
         $formats = [],
         $options = [],
-        $sets = []
+        $sets = [],
+        $loading = null
     ) {
         $this->imaginator = $imaginator;
         $this->id = $id;
@@ -27,6 +29,7 @@ class ImaginatorComponent extends Component
         $this->formats = $formats;
         $this->options = $options;
         $this->sets = $sets;
+        $this->loading = $loading ?? 'eager';
     }
 
     private function imaginatorGenUrls()
@@ -59,7 +62,7 @@ class ImaginatorComponent extends Component
                     'srcset' => $srcset ?? [],
                     'media' => $set['media'] ?? '',
                     'sizes' => $set['sizes'] ?? '',
-                    'options' => $options ?? [],
+                    'options' => $this->options ?? [],
                     'format' => $format
                 ]);
 
@@ -75,7 +78,7 @@ class ImaginatorComponent extends Component
             }
         }
 
-        $html .= "<img src='{$this->imaginator->generateUrls(['hash' => $this->id, 'options'=> $this->options])['base']}' alt='{$this->alt}' loading='lazy'>";
+        $html .= "<img src='{$this->imaginator->generateUrls(['hash' => $this->id, 'options'=> $this->options])['base']}' alt='{$this->alt}' loading={$this->loading}>";
         return $html;
     }
 
