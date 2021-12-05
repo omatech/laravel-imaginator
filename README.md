@@ -66,6 +66,10 @@ We will need a class with the method `extract` to get the image path. You can ov
     // If exists loading attribute, add loading tag and value in picture element
     'loading' => 'lazy',
     
+    // If exists width and height attributes they will be added at the end of the fallback img tag
+    'width' => '165px',
+    'height' => '165px',
+
     // All the formats in which to generate the image.
     'formats' => ['webp','png','jpg'],
 
@@ -88,6 +92,23 @@ We will need a class with the method `extract` to get the image path. You can ov
 ```
 
 All you need to do is call the component `@imaginator` from a Laravel Blade.
+
+## Example usage
+
+```
+<x-imaginator :formats="['webp', 'png', 'jpg']"
+    :id="xxxxx" 
+    :sets="[
+        0 => [ 'srcset' => [55=>320, 60=>480, 65=>800, 70=>992] ]]" 
+        class="pic"
+    alt="Alt text" 
+    data-toggle="modal"
+    data-target="#modal-pack-xxxx" 
+    loading="lazy"
+    width="70px"
+    height="70px"
+/>
+```
 
 ## Organization
 
