@@ -15,6 +15,7 @@ class ImaginatorComponent extends Component
     public $loading;
     public $width='';
     public $height='';
+    public $imgclass='';
 
     public function __construct(
         Imaginator $imaginator,
@@ -80,7 +81,7 @@ class ImaginatorComponent extends Component
             }
         }
 
-        $html .= "<img src='{$this->imaginator->generateUrls(['hash' => $this->id, 'options'=> $this->options])['base']}' alt='{$this->alt}' loading={$this->loading} {$this->width} {$this->height}>";
+        $html .= "<img src='{$this->imaginator->generateUrls(['hash' => $this->id, 'options'=> $this->options])['base']}' alt='{$this->alt}' loading={$this->loading} {$this->width} {$this->height} {$this->imgclass}>";
         return $html;
     }
 
@@ -88,13 +89,16 @@ class ImaginatorComponent extends Component
     public function render()
     {
         return function (array $data) {
-            $attributes = $data['attributes']->filter(fn ($attribute, $key) => !is_array($attribute) && $key !== 'id' && $key !== 'alt' && $key!=='width' && $key!=='height');
+            $attributes = $data['attributes']->filter(fn ($attribute, $key) => !is_array($attribute) && $key !== 'id' && $key !== 'alt' && $key!=='width' && $key!=='height' && $key!=='imgclass');
 
             if (isset($data['attributes']['width'])) {
                 $this->width=' width="'.$data['attributes']['width'].'"';
             }
             if (isset($data['attributes']['height'])) {
                 $this->height=' height="'.$data['attributes']['height'].'"';
+            }
+            if (isset($data['attributes']['imgclass'])) {
+                $this->imgclass=' class="'.$data['attributes']['imgclass'].'"';
             }
 
             return "<picture {$attributes->__toString()}>
