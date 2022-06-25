@@ -2,7 +2,7 @@
 
 namespace Omatech\Imaginator\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use Omatech\Imaginator\Repositories\Imaginator;
 
 class ImaginatorController extends Controller
@@ -13,7 +13,7 @@ class ImaginatorController extends Controller
         session_cache_limiter('public');
         session_start();
         header_remove( 'Pragma' );
-        
+
         return $imaginator->getProcessedImage($path, request()->all());
     }
 }
