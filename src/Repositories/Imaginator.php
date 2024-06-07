@@ -4,7 +4,7 @@ namespace Omatech\Imaginator\Repositories;
 
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Filesystem\FileNotFoundException;
-use League\Glide\Responses\LaravelResponseFactory;
+use League\Glide\Responses\SymfonyResponseFactory;
 use League\Glide\ServerFactory;
 use League\Glide\Signatures\Signature;
 use Omatech\Imaginator\Contracts\GetImageInterface;
@@ -131,7 +131,7 @@ class Imaginator
             try {
                 $path = $this->extractImage(app()->make($loader['get_image_class']), $path);
                 $server = ServerFactory::create([
-                    'response'   => new LaravelResponseFactory(app('request')),
+                    'response'   => new SymfonyResponseFactory(app('request')),
                     'source'     => Storage::disk($loader['source_disk'])->getDriver(),
                     'cache'      => Storage::disk($loader['cache_disk'])->getDriver(),
                     'watermarks' => Storage::disk($loader['cache_disk'])->getDriver(),
