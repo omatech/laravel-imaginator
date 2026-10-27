@@ -4,9 +4,9 @@ namespace Omatech\Imaginator\Repositories;
 
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Filesystem\FileNotFoundException;
-use League\Glide\Responses\SymfonyResponseFactory;
 use League\Glide\ServerFactory;
 use League\Glide\Signatures\Signature;
+use Omatech\Imaginator\Responses\SymfonyResponseFactory;
 use Omatech\Imaginator\Contracts\GetImageInterface;
 
 class Imaginator

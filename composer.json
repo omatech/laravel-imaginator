@@ -3,7 +3,8 @@
     "license": "MIT",
     "description": "",
     "require": {
-        "league/glide-symfony": "^2.0.1"
+        "league/glide": "^2.0 || ^3.0 || ^4.0",
+        "symfony/http-foundation": "^5.0 || ^6.0 || ^7.0 || ^8.0"
     },
     "authors": [
         {
