@@ -182,7 +182,7 @@ class Imaginator
         $newImg = imagecreate($imgWidth, $imgHeight);
         $bgColor = imagecolorallocate($newImg, 0, 0, 0);
         $fontColor = imagecolorallocate($newImg, 255, 0, 0);
-        imagestring($newImg, $fontSize, $xPosition, $yPosition, $text, $fontColor);
+        imagestring($newImg, $fontSize, (int) $xPosition, (int) $yPosition, $text, $fontColor);
 
         ob_start();
         imagepng($newImg);
@@ -190,7 +190,6 @@ class Imaginator
         ob_end_clean();
 
         Storage::disk(config('imaginator.cache_disk'))->put('.watermarks/'.$fileName, $image);
-        imagedestroy($newImg);
 
         return $params;
     }
