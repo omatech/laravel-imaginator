@@ -8,6 +8,7 @@ use League\Glide\ServerFactory;
 use League\Glide\Signatures\Signature;
 use Omatech\Imaginator\Responses\SymfonyResponseFactory;
 use Omatech\Imaginator\Contracts\GetImageInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Imaginator
 {
@@ -129,6 +130,7 @@ class Imaginator
     public function getProcessedImage($path, $params)
     {
         $loaders = config('imaginator.loaders');
+        $response = null;
         foreach ($loaders as $loader) {
             try {
                 $path = $this->extractImage(app()->make($loader['get_image_class']), $path);
@@ -151,6 +153,10 @@ class Imaginator
             } catch (FileNotFoundException $e) {
                 $response = null;
             }
+        }
+        // No loader has the image: a 404, not the empty 200 a null response becomes.
+        if (!$response) {
+            throw new NotFoundHttpException('No loader serves this image.');
         }
         return $response;
     }
