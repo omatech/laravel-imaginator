@@ -23,6 +23,8 @@ class Imaginator
     public function generateUrls($data)
     {
         $srcset = '';
+        // Content without an image passes no hash: Glide 3+ requires a string, so keep Glide 2's empty path.
+        $hash = (string) ($data['hash'] ?? '');
         $sizes = $data['srcset'] ?? [];
         $options = $data['options'] ?? [];
         $format = $data['format'] ?? [];
@@ -34,17 +36,17 @@ class Imaginator
         }
 
         foreach ($sizes as $size => $width) {
-            $srcset .= $this->prepareUri($data['hash'], $format, $options, [$size => $width]);
+            $srcset .= $this->prepareUri($hash, $format, $options, [$size => $width]);
         }
 
         if (empty($srcset)) {
-            $srcset .= $this->prepareUri($data['hash'], $format, $options);
+            $srcset .= $this->prepareUri($hash, $format, $options);
         } else {
             $srcset = substr($srcset, 0, -2);
         }
 
         return [
-            'base'  =>  $this->prepareUri($data['hash'], 'png', $options),
+            'base'  =>  $this->prepareUri($hash, 'png', $options),
             'srcset' => $srcset,
             'format' => $format
         ];

@@ -2,9 +2,9 @@
 
 namespace Omatech\Imaginator\Exceptions;
 
-use Exception;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class SecurityException extends Exception
+/** A missing or forged Glide signature is the client's error: 403, and Laravel does not report HTTP exceptions. */
+class SecurityException extends AccessDeniedHttpException
 {
-
 }
