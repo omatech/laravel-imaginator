@@ -2,3 +2,7 @@
 .history
 .idea/
 vendor
+
+/vendor/
+/.phpunit.cache/
+/.docker/evidence/
